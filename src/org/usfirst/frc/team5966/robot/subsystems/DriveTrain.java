@@ -29,7 +29,22 @@ public class DriveTrain extends Subsystem {
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new MySpecialCommand());
-//    	robotDrive = new RobotDrive
+
+    }
+    
+    public void baseRegularDrive(double speed, double rotation)
+    {
+    	robotDrive.curvatureDrive(speed, rotation, false);
+    }
+    
+    public void forwardDrive(double speed, double rotation)
+    {
+    	baseRegularDrive(speed, rotation);
+    }
+    
+    public void reverseDrive(double speed, double rotation)
+    {
+    	baseRegularDrive(-1 * speed, -1 * rotation);
     }
 }
 
