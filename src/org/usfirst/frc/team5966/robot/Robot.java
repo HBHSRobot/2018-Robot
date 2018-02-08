@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Ultrasonic;
 
 import org.usfirst.frc.team5966.robot.commands.AutoDrive;
+import org.usfirst.frc.team5966.robot.commands.AutoLift;
 import org.usfirst.frc.team5966.robot.commands.ExampleCommand;
 import org.usfirst.frc.team5966.robot.subsystems.ExampleSubsystem;
 
@@ -39,6 +41,9 @@ public class Robot extends TimedRobot
 	Command autoDriveCommand, autoLiftCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
 
+	Ultrasonic ultra = new Ultrasonic(0,0);
+	double distance;
+	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -51,7 +56,8 @@ public class Robot extends TimedRobot
 		// chooser.addObject("My Auto", new MyAutoCommand());
 		SmartDashboard.putData("Auto mode", m_chooser);
 		autoDriveCommand = new AutoDrive();
-		autoLiftCommand = new AutoDrive();
+		autoLiftCommand = new AutoLift();
+		ultra.setEnabled(true);
 	}
 
 	/**
@@ -87,7 +93,7 @@ public class Robot extends TimedRobot
 	public void autonomousInit() {
 		
 		// schedule the autonomous command (example)
-		
+		ultra.setAutomaticMode(true);
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		if (autoDriveCommand != null)
 		{
@@ -108,8 +114,21 @@ public class Robot extends TimedRobot
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic()
+	{
 		Scheduler.getInstance().run();
+		while(ultra.isRangeValid()) 
+		{
+			distance = ultra.getRangeInches();
+			if(distance >= 2.75) 
+			{
+				if (autoDriveCommand != null) 
+				{
+					autoDriveCommand.cancel();
+				}
+			}
+		}
+		System.out.println(ultra.isEnabled());
 	}
 
 	@Override
@@ -126,6 +145,7 @@ public class Robot extends TimedRobot
 		{
 			autoLiftCommand.cancel();
 		}
+		ultra.setAutomaticMode(false);
 	}
 
 	/**
