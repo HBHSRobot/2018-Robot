@@ -99,15 +99,9 @@ public class Robot extends TimedRobot
 		{
 			autoDriveCommand.start();
 		}
-		switch(switchNo)
-		{
-			case 0:
-				if((gameData.charAt(0) == 'L') && (autoLiftCommand != null)) autoLiftCommand.start();
-				break;
-			case 2:
-				if((gameData.charAt(0) == 'R') && (autoLiftCommand != null)) autoLiftCommand.start();
-				break;
-		}
+		/* I moved the switch logic to autoPeriodic because the sensor updates through periodic, and only
+		 * when the drive is stopped, based on the sensor, is the lift going to operate
+		 */
 	}
 
 	/**
@@ -120,11 +114,18 @@ public class Robot extends TimedRobot
 		while(ultra.isRangeValid()) 
 		{
 			distance = ultra.getRangeInches();
+			//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
 			if(distance >= 2.75) 
 			{
-				if (autoDriveCommand != null) 
+				if (autoDriveCommand != null) autoDriveCommand.cancel();
+				switch(switchNo)
 				{
-					autoDriveCommand.cancel();
+					case 0:
+						if((gameData.charAt(0) == 'L') && (autoLiftCommand != null)) autoLiftCommand.start();
+						break;
+					case 2:
+						if((gameData.charAt(0) == 'R') && (autoLiftCommand != null)) autoLiftCommand.start();
+						break;
 				}
 			}
 		}
