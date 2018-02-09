@@ -7,13 +7,13 @@
 
 package org.usfirst.frc.team5966.robot;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Ultrasonic;
 
 import org.usfirst.frc.team5966.robot.commands.AutoDrive;
 import org.usfirst.frc.team5966.robot.commands.AutoLift;
@@ -41,8 +41,8 @@ public class Robot extends TimedRobot
 	Command autoDriveCommand, autoLiftCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
 
-	Ultrasonic ultra = new Ultrasonic(0,0);
-	double distance;
+	AnalogInput sensor;
+	double volts;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -57,7 +57,8 @@ public class Robot extends TimedRobot
 		SmartDashboard.putData("Auto mode", m_chooser);
 		autoDriveCommand = new AutoDrive();
 		autoLiftCommand = new AutoLift();
-		ultra.setEnabled(true);
+		sensor = new AnalogInput(0);
+		volts = sensor.getVoltage();
 	}
 
 	/**
@@ -93,7 +94,7 @@ public class Robot extends TimedRobot
 	public void autonomousInit() {
 		
 		// schedule the autonomous command (example)
-		ultra.setAutomaticMode(true);
+		//ultra.setAutomaticMode(true);
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		if (autoDriveCommand != null)
 		{
@@ -111,25 +112,23 @@ public class Robot extends TimedRobot
 	public void autonomousPeriodic()
 	{
 		Scheduler.getInstance().run();
-		while(ultra.isRangeValid()) 
-		{
-			distance = ultra.getRangeInches();
+		double distance = volts / 9.766;
 			//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
-			if(distance >= 2.75) 
+		if(distance >= 2.75) 
+		{
+			if (autoDriveCommand != null) autoDriveCommand.cancel();
+			switch(switchNo)
 			{
-				if (autoDriveCommand != null) autoDriveCommand.cancel();
-				switch(switchNo)
-				{
-					case 0:
-						if((gameData.charAt(0) == 'L') && (autoLiftCommand != null)) autoLiftCommand.start();
-						break;
-					case 2:
-						if((gameData.charAt(0) == 'R') && (autoLiftCommand != null)) autoLiftCommand.start();
-						break;
-				}
+				case 0:
+					if((gameData.charAt(0) == 'L') && (autoLiftCommand != null)) autoLiftCommand.start();
+					break;
+				case 2:
+					if((gameData.charAt(0) == 'R') && (autoLiftCommand != null)) autoLiftCommand.start();
+					break;
 			}
 		}
-		System.out.println(ultra.isEnabled());
+		//just for testing to check that the reading in the program corresponds with the reading fron LabView
+		System.out.println(volts);
 	}
 
 	@Override
@@ -146,7 +145,6 @@ public class Robot extends TimedRobot
 		{
 			autoLiftCommand.cancel();
 		}
-		ultra.setAutomaticMode(false);
 	}
 
 	/**
