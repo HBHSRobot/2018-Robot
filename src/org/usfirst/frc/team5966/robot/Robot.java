@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.usfirst.frc.team5966.robot.commands.AutoDrive;
-import org.usfirst.frc.team5966.robot.commands.AutoLift;
+import org.usfirst.frc.team5966.robot.commands.DriveFunction;
+import org.usfirst.frc.team5966.robot.commands.LiftElevate;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -39,11 +39,13 @@ public class Robot extends TimedRobot
 
 	String gameData;
 	
-	Command autoDriveCommand, autoLiftCommand;
+	Command driveCommand, liftCommand;
 	SendableChooser<StartingPosition> startingPositionChooser = new SendableChooser<>();
 
 	AnalogInput sensor;
 	double volts;
+	
+	boolean autoDriveFinished;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -59,8 +61,9 @@ public class Robot extends TimedRobot
 		startingPositionChooser.addObject("Right", StartingPosition.RIGHT);
 		SmartDashboard.putData("Starting Position", startingPositionChooser);
 		//command initilization
-		autoDriveCommand = new AutoDrive();
-		autoLiftCommand = new AutoLift();
+		driveCommand = new DriveFunction();
+		liftCommand = new LiftElevate();
+		autoDriveFinished = false;
 		//proximity sensor
 		sensor = new AnalogInput(0);
 		//Camera Server
@@ -100,15 +103,32 @@ public class Robot extends TimedRobot
 	 * chooser code above (like the commented example) or additional comparisons
 	 * to the switch structure below with additional strings & commands.
 	 */
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void autonomousInit() {
 		
 		// schedule the autonomous command (example)
-		//ultra.setAutomaticMode(true);
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
-		if (autoDriveCommand != null)
+		switch(startingPositionChooser.getSelected())
 		{
-			autoDriveCommand.start();
+			case LEFT:
+				if((gameData.charAt(0) == 'L') && (liftCommand != null)) 
+				{
+					liftCommand.start();
+					autoDriveFinished = true;
+				}
+				break;
+			case RIGHT:
+				if((gameData.charAt(0) == 'R') && (liftCommand != null)) 
+				{
+					liftCommand.start();
+					autoDriveFinished = true;
+				}
+				break;
+		}
+		if (driveCommand != null && autoDriveFinished == true)
+		{
+			driveCommand.start();
 		}
 		/* I moved the switch logic to autoPeriodic because the sensor updates through periodic, and only
 		 * when the drive is stopped, based on the sensor, is the lift going to operate
@@ -118,7 +138,6 @@ public class Robot extends TimedRobot
 	/**
 	 * This function is called periodically during autonomous.
 	 */
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void autonomousPeriodic()
 	{
@@ -127,16 +146,7 @@ public class Robot extends TimedRobot
 			//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
 		if(distance >= 2.75) 
 		{
-			if (autoDriveCommand != null) autoDriveCommand.cancel();
-			switch(startingPositionChooser.getSelected())
-			{
-				case LEFT:
-					if((gameData.charAt(0) == 'L') && (autoLiftCommand != null)) autoLiftCommand.start();
-					break;
-				case RIGHT:
-					if((gameData.charAt(0) == 'R') && (autoLiftCommand != null)) autoLiftCommand.start();
-					break;
-			}
+			if (driveCommand != null) driveCommand.cancel();
 		}
 		//just for testing to check that the reading in the program corresponds with the reading fron LabView
 		System.out.println(volts);
@@ -148,13 +158,13 @@ public class Robot extends TimedRobot
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
-		if (autoDriveCommand != null) 
+		if (driveCommand != null) 
 		{
-			autoDriveCommand.cancel();
+			driveCommand.cancel();
 		}
-		if (autoLiftCommand != null)
+		if (liftCommand != null)
 		{
-			autoLiftCommand.cancel();
+			liftCommand.cancel();
 		}
 	}
 
