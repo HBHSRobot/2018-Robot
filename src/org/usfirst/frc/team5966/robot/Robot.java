@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.usfirst.frc.team5966.robot.commands.DriveFunction;
+import org.usfirst.frc.team5966.robot.commands.DriveForwards;
 import org.usfirst.frc.team5966.robot.commands.LiftElevate;
 
 /**
@@ -61,7 +61,7 @@ public class Robot extends TimedRobot
 		startingPositionChooser.addObject("Right", StartingPosition.RIGHT);
 		SmartDashboard.putData("Starting Position", startingPositionChooser);
 		//command initilization
-		driveCommand = new DriveFunction();
+		driveCommand = new DriveForwards();
 		liftCommand = new LiftElevate();
 		autoDriveFinished = false;
 		//proximity sensor
@@ -115,18 +115,15 @@ public class Robot extends TimedRobot
 				if((gameData.charAt(0) == 'L') && (liftCommand != null)) 
 				{
 					liftCommand.start();
-					autoDriveFinished = true;
 				}
 				break;
 			case RIGHT:
 				if((gameData.charAt(0) == 'R') && (liftCommand != null)) 
 				{
 					liftCommand.start();
-					autoDriveFinished = true;
 				}
 				break;
 		}
-		if (driveCommand != null && autoDriveFinished == true)
 		{
 			driveCommand.start();
 		}

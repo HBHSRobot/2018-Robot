@@ -3,20 +3,23 @@ package org.usfirst.frc.team5966.robot.commands;
 import org.usfirst.frc.team5966.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class DriveFunction extends Command{
+public class DriveForwards extends Command{
 
-	int timer;
-	boolean leftPosition;
 	final double BASE_SPEED = -0.32;
-	//double speed;
 	DriveTrain drivetrain = new DriveTrain();
-	boolean forwards, backwards, finished;
+	private boolean isAutonomous;
 	
-	public DriveFunction()
+	public DriveForwards(boolean isAutonomous)
 	{
 		requires(drivetrain);
+		this.isAutonomous = isAutonomous;
 	}
 
+    public void changeAutonomousMode()
+    {
+    	isAutonomous = !isAutonomous;
+    }
+    
 	protected void initialize()
 	{
 		
@@ -24,7 +27,10 @@ public class DriveFunction extends Command{
 	
 	protected void execute()
 	{
-		drivetrain.forwardDrive(BASE_SPEED, 0);
+		if (isAutonomous)
+			drivetrain.forwardDrive(BASE_SPEED, 0);
+		else
+			drivetrain.forwardDrive(0, 0);
 	}
 	
 	protected boolean isFinished() 
