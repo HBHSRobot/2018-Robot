@@ -142,7 +142,7 @@ public class Robot extends TimedRobot
 	{
 		Scheduler.getInstance().run();
 		double distance = sensor.getVoltage() / 9.766;
-			//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
+		//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
 		if(distance >= 2.75) 
 		{
 			if (driveForwards != null) driveForwards.cancel();
@@ -159,12 +159,10 @@ public class Robot extends TimedRobot
 		// this line or comment it out.
 		if (driveForwards != null) 
 		{
-			driveForwards.cancel();
 			driveForwards.changeAutonomousMode();
 		}
 		if (liftElevate != null)
 		{
-			liftElevate.cancel();
 			liftElevate.changeAutonomousMode();
 		}
 	}
