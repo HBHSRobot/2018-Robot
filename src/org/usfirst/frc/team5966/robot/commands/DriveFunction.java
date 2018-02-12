@@ -3,16 +3,16 @@ package org.usfirst.frc.team5966.robot.commands;
 import org.usfirst.frc.team5966.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.command.Command;
 
-public class AutoDrive extends Command{
+public class DriveFunction extends Command{
 
 	int timer;
 	boolean leftPosition;
 	final double BASE_SPEED = -0.32;
 	//double speed;
 	DriveTrain drivetrain = new DriveTrain();
-	boolean forwards, backwards;
+	boolean forwards, backwards, finished;
 	
-	public AutoDrive()
+	public DriveFunction()
 	{
 		requires(drivetrain);
 	}
