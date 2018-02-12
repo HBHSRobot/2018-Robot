@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import org.usfirst.frc.team5966.robot.commands.DriveBackwards;
 import org.usfirst.frc.team5966.robot.commands.DriveForwards;
 import org.usfirst.frc.team5966.robot.commands.LiftElevate;
 
@@ -39,7 +40,9 @@ public class Robot extends TimedRobot
 
 	String gameData;
 	
-	Command driveCommand, liftCommand;
+	DriveForwards driveForwards;
+	DriveBackwards driveBackwards;
+	LiftElevate liftElevate;
 	SendableChooser<StartingPosition> startingPositionChooser = new SendableChooser<>();
 
 	AnalogInput sensor;
@@ -60,9 +63,6 @@ public class Robot extends TimedRobot
 		startingPositionChooser.addDefault("Middle", StartingPosition.MIDDLE);
 		startingPositionChooser.addObject("Right", StartingPosition.RIGHT);
 		SmartDashboard.putData("Starting Position", startingPositionChooser);
-		//command initilization
-		driveCommand = new DriveForwards();
-		liftCommand = new LiftElevate();
 		autoDriveFinished = false;
 		//proximity sensor
 		sensor = new AnalogInput(0);
@@ -106,26 +106,28 @@ public class Robot extends TimedRobot
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void autonomousInit() {
+		driveForwards = new DriveForwards(true);
+		liftElevate = new LiftElevate(true);
 		
 		// schedule the autonomous command (example)
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		switch(startingPositionChooser.getSelected())
 		{
 			case LEFT:
-				if((gameData.charAt(0) == 'L') && (liftCommand != null)) 
+				if((gameData.charAt(0) == 'L') && (liftElevate != null)) 
 				{
-					liftCommand.start();
+					liftElevate.start();
 				}
 				break;
 			case RIGHT:
-				if((gameData.charAt(0) == 'R') && (liftCommand != null)) 
+				if((gameData.charAt(0) == 'R') && (liftElevate != null)) 
 				{
-					liftCommand.start();
+					liftElevate.start();
 				}
 				break;
 		}
 		{
-			driveCommand.start();
+			driveForwards.start();
 		}
 		/* I moved the switch logic to autoPeriodic because the sensor updates through periodic, and only
 		 * when the drive is stopped, based on the sensor, is the lift going to operate
@@ -143,7 +145,7 @@ public class Robot extends TimedRobot
 			//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
 		if(distance >= 2.75) 
 		{
-			if (driveCommand != null) driveCommand.cancel();
+			if (driveForwards != null) driveForwards.cancel();
 		}
 		//just for testing to check that the reading in the program corresponds with the reading fron LabView
 		System.out.println(volts);
@@ -155,13 +157,15 @@ public class Robot extends TimedRobot
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
-		if (driveCommand != null) 
+		if (driveForwards != null) 
 		{
-			driveCommand.cancel();
+			driveForwards.cancel();
+			driveForwards.changeAutonomousMode();
 		}
-		if (liftCommand != null)
+		if (liftElevate != null)
 		{
-			liftCommand.cancel();
+			liftElevate.cancel();
+			liftElevate.changeAutonomousMode();
 		}
 	}
 
