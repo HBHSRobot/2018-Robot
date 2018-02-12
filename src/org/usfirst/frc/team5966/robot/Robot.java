@@ -63,7 +63,6 @@ public class Robot extends TimedRobot
 		autoLiftCommand = new AutoLift();
 		//proximity sensor
 		sensor = new AnalogInput(0);
-		volts = sensor.getVoltage();
 		//Camera Server
 		cameraServer = CameraServer.getInstance();
 		UsbCamera camera = new UsbCamera("Lifecam", "/dev/video0");
@@ -124,7 +123,7 @@ public class Robot extends TimedRobot
 	public void autonomousPeriodic()
 	{
 		Scheduler.getInstance().run();
-		double distance = volts / 9.766;
+		double distance = sensor.getVoltage() / 9.766;
 			//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
 		if(distance >= 2.75) 
 		{
