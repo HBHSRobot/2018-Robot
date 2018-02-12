@@ -31,7 +31,8 @@ public class Robot extends TimedRobot
 {
 	public static final ExampleSubsystem kExampleSubsystem
 			= new ExampleSubsystem();
-	public static OI m_oi;
+	public static OI oi;
+	CameraServer cameraServer;
 
 	String gameData;
 	
@@ -51,14 +52,22 @@ public class Robot extends TimedRobot
 	@Override
 	public void robotInit() 
 	{
-		m_oi = new OI();
+		oi = new OI();
 		m_chooser.addDefault("Default Auto", new ExampleCommand());
 		// chooser.addObject("My Auto", new MyAutoCommand());
 		SmartDashboard.putData("Auto mode", m_chooser);
+		//command initilization
 		autoDriveCommand = new AutoDrive();
 		autoLiftCommand = new AutoLift();
+		//proximity sensor
 		sensor = new AnalogInput(0);
 		volts = sensor.getVoltage();
+		//Camera Server
+		cameraServer = CameraServer.getInstance();
+		UsbCamera camera = new UsbCamera("Lifecam", "/dev/video0");
+		cameraServer.addCamera(camera);
+		cameraServer.startAutomaticCapture(camera);
+		System.out.println("Robot Initialization Complete");
 	}
 
 	/**
