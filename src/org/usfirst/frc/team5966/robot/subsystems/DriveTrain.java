@@ -22,7 +22,6 @@ public class DriveTrain extends Subsystem {
 	//1 drive train
 	DifferentialDrive robotDrive = new DifferentialDrive(leftMotors, rightMotors);
 	
-	
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 

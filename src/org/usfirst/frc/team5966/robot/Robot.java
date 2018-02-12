@@ -7,11 +7,16 @@
 
 package org.usfirst.frc.team5966.robot;
 
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import org.usfirst.frc.team5966.robot.commands.AutoDrive;
+import org.usfirst.frc.team5966.robot.commands.AutoLift;
 import org.usfirst.frc.team5966.robot.commands.ExampleCommand;
 import org.usfirst.frc.team5966.robot.subsystems.ExampleSubsystem;
 
@@ -22,24 +27,47 @@ import org.usfirst.frc.team5966.robot.subsystems.ExampleSubsystem;
  * creating this project, you must also update the build.properties file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends TimedRobot 
+{
 	public static final ExampleSubsystem kExampleSubsystem
 			= new ExampleSubsystem();
-	public static OI m_oi;
+	public static OI oi;
+	CameraServer cameraServer;
 
-	Command m_autonomousCommand;
+	String gameData;
+	
+	//left is 0, middle is 1, right is 2
+	int switchNo;
+	
+	Command autoDriveCommand, autoLiftCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
 
+	AnalogInput sensor;
+	double volts;
+	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
 	@Override
-	public void robotInit() {
-		m_oi = new OI();
+	public void robotInit() 
+	{
+		oi = new OI();
 		m_chooser.addDefault("Default Auto", new ExampleCommand());
 		// chooser.addObject("My Auto", new MyAutoCommand());
 		SmartDashboard.putData("Auto mode", m_chooser);
+		//command initilization
+		autoDriveCommand = new AutoDrive();
+		autoLiftCommand = new AutoLift();
+		//proximity sensor
+		sensor = new AnalogInput(0);
+		volts = sensor.getVoltage();
+		//Camera Server
+		cameraServer = CameraServer.getInstance();
+		UsbCamera camera = new UsbCamera("Lifecam", "/dev/video0");
+		cameraServer.addCamera(camera);
+		cameraServer.startAutomaticCapture(camera);
+		System.out.println("Robot Initialization Complete");
 	}
 
 	/**
@@ -48,14 +76,17 @@ public class Robot extends TimedRobot {
 	 * the robot is disabled.
 	 */
 	@Override
-	public void disabledInit() {
+	public void disabledInit() 
+	{
 
 	}
 
 	@Override
-	public void disabledPeriodic() {
+	public void disabledPeriodic() 
+	{
 		Scheduler.getInstance().run();
 	}
+	
 
 	/**
 	 * This autonomous (along with the chooser code above) shows how to select
@@ -70,27 +101,43 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		m_autonomousCommand = m_chooser.getSelected();
-
-		/*
-		 * String autoSelected = SmartDashboard.getString("Auto Selector",
-		 * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
-		 * = new MyAutoCommand(); break; case "Default Auto": default:
-		 * autonomousCommand = new ExampleCommand(); break; }
-		 */
-
+		
 		// schedule the autonomous command (example)
-		if (m_autonomousCommand != null) {
-			m_autonomousCommand.start();
+		//ultra.setAutomaticMode(true);
+		gameData = DriverStation.getInstance().getGameSpecificMessage();
+		if (autoDriveCommand != null)
+		{
+			autoDriveCommand.start();
 		}
+		/* I moved the switch logic to autoPeriodic because the sensor updates through periodic, and only
+		 * when the drive is stopped, based on the sensor, is the lift going to operate
+		 */
 	}
 
 	/**
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic()
+	{
 		Scheduler.getInstance().run();
+		double distance = volts / 9.766;
+			//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
+		if(distance >= 2.75) 
+		{
+			if (autoDriveCommand != null) autoDriveCommand.cancel();
+			switch(switchNo)
+			{
+				case 0:
+					if((gameData.charAt(0) == 'L') && (autoLiftCommand != null)) autoLiftCommand.start();
+					break;
+				case 2:
+					if((gameData.charAt(0) == 'R') && (autoLiftCommand != null)) autoLiftCommand.start();
+					break;
+			}
+		}
+		//just for testing to check that the reading in the program corresponds with the reading fron LabView
+		System.out.println(volts);
 	}
 
 	@Override
@@ -99,8 +146,13 @@ public class Robot extends TimedRobot {
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
-		if (m_autonomousCommand != null) {
-			m_autonomousCommand.cancel();
+		if (autoDriveCommand != null) 
+		{
+			autoDriveCommand.cancel();
+		}
+		if (autoLiftCommand != null)
+		{
+			autoLiftCommand.cancel();
 		}
 	}
 
