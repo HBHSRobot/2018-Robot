@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team5966.robot.commands.AutoDrive;
 import org.usfirst.frc.team5966.robot.commands.AutoLift;
-import org.usfirst.frc.team5966.robot.commands.ExampleCommand;
-import org.usfirst.frc.team5966.robot.subsystems.ExampleSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -36,7 +34,6 @@ public class Robot extends TimedRobot
 		LEFT, MIDDLE, RIGHT
 	}
 	
-	public static final ExampleSubsystem kExampleSubsystem = new ExampleSubsystem();
 	public static OI oi;
 	CameraServer cameraServer;
 
