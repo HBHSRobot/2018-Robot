@@ -7,7 +7,9 @@
 
 package org.usfirst.frc.team5966.robot;
 
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -29,18 +31,19 @@ import org.usfirst.frc.team5966.robot.subsystems.ExampleSubsystem;
  */
 public class Robot extends TimedRobot 
 {
-	public static final ExampleSubsystem kExampleSubsystem
-			= new ExampleSubsystem();
+	public enum StartingPosition
+	{
+		LEFT, MIDDLE, RIGHT
+	}
+	
+	public static final ExampleSubsystem kExampleSubsystem = new ExampleSubsystem();
 	public static OI oi;
 	CameraServer cameraServer;
 
 	String gameData;
 	
-	//left is 0, middle is 1, right is 2
-	int switchNo;
-	
 	Command autoDriveCommand, autoLiftCommand;
-	SendableChooser<Command> m_chooser = new SendableChooser<>();
+	SendableChooser<StartingPosition> startingPositionChooser = new SendableChooser<>();
 
 	AnalogInput sensor;
 	double volts;
@@ -53,9 +56,11 @@ public class Robot extends TimedRobot
 	public void robotInit() 
 	{
 		oi = new OI();
-		m_chooser.addDefault("Default Auto", new ExampleCommand());
-		// chooser.addObject("My Auto", new MyAutoCommand());
-		SmartDashboard.putData("Auto mode", m_chooser);
+		//Chooser for the robot's starting position on the dashboard
+		startingPositionChooser.addObject("Left", StartingPosition.LEFT);
+		startingPositionChooser.addDefault("Middle", StartingPosition.MIDDLE);
+		startingPositionChooser.addObject("Right", StartingPosition.RIGHT);
+		SmartDashboard.putData("Starting Position", startingPositionChooser);
 		//command initilization
 		autoDriveCommand = new AutoDrive();
 		autoLiftCommand = new AutoLift();
@@ -117,6 +122,7 @@ public class Robot extends TimedRobot
 	/**
 	 * This function is called periodically during autonomous.
 	 */
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void autonomousPeriodic()
 	{
@@ -126,12 +132,12 @@ public class Robot extends TimedRobot
 		if(distance >= 2.75) 
 		{
 			if (autoDriveCommand != null) autoDriveCommand.cancel();
-			switch(switchNo)
+			switch(startingPositionChooser.getSelected())
 			{
-				case 0:
+				case LEFT:
 					if((gameData.charAt(0) == 'L') && (autoLiftCommand != null)) autoLiftCommand.start();
 					break;
-				case 2:
+				case RIGHT:
 					if((gameData.charAt(0) == 'R') && (autoLiftCommand != null)) autoLiftCommand.start();
 					break;
 			}
