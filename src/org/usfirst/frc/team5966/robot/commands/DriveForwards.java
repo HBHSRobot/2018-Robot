@@ -8,6 +8,7 @@ public class DriveForwards extends Command{
 	final double BASE_SPEED = -0.32;
 	DriveTrain drivetrain = new DriveTrain();
 	private boolean isAutonomous;
+	public double speed, rotation;
 	
 	public DriveForwards(boolean isAutonomous)
 	{
@@ -28,9 +29,13 @@ public class DriveForwards extends Command{
 	protected void execute()
 	{
 		if (isAutonomous)
+		{
 			drivetrain.forwardDrive(BASE_SPEED, 0);
+		}			
 		else
-			drivetrain.forwardDrive(0, 0);
+		{
+			drivetrain.forwardDrive(speed, rotation);
+		}
 	}
 	
 	protected boolean isFinished() 
