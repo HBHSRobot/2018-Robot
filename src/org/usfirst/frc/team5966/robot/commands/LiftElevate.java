@@ -33,9 +33,13 @@ public class LiftElevate extends Command {
     protected void execute() 
     {
     	if (isAutonomous)
+    	{
     		lift.liftUp(0.32);
+    	}
     	else
+    	{
     		lift.liftUp(0);
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()

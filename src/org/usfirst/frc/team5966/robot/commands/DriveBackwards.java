@@ -11,6 +11,8 @@ public class DriveBackwards extends Command {
 
 	DriveTrain drivetrain = new DriveTrain();
 	
+	public double speed, rotation;
+	
     public DriveBackwards() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
@@ -23,7 +25,7 @@ public class DriveBackwards extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	drivetrain.reverseDrive(0,  0);
+    	drivetrain.reverseDrive(speed, rotation);
     }
 
     // Make this return true when this Command no longer needs to run execute()

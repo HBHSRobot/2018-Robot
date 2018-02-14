@@ -50,6 +50,9 @@ public class Robot extends TimedRobot
 	
 	boolean autoDriveFinished;
 	
+	final int RIGHT_TRIGGER_AXIS = 3;
+	final int LEFT_TRIGGER_AXIS = 2;
+	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -105,12 +108,15 @@ public class Robot extends TimedRobot
 	 */
 	@SuppressWarnings("incomplete-switch")
 	@Override
-	public void autonomousInit() {
+	public void autonomousInit() 
+	{
 		driveForwards = new DriveForwards(true);
 		liftElevate = new LiftElevate(true);
 		
-		// schedule the autonomous command (example)
+		//schedule the autonomous command (example)
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
+		//gathers the data from the dashboard on the position of the robot
+		//if the robot is in the same position as the switch as reported by LabView, then it will lift up
 		switch(startingPositionChooser.getSelected())
 		{
 			case LEFT:
@@ -126,9 +132,7 @@ public class Robot extends TimedRobot
 				}
 				break;
 		}
-		{
-			driveForwards.start();
-		}
+		driveForwards.start();
 		/* I moved the switch logic to autoPeriodic because the sensor updates through periodic, and only
 		 * when the drive is stopped, based on the sensor, is the lift going to operate
 		 */
@@ -141,6 +145,7 @@ public class Robot extends TimedRobot
 	public void autonomousPeriodic()
 	{
 		Scheduler.getInstance().run();
+		//gets the voltage from the sensor, then divides it by 9.766, our scaling factor
 		double distance = sensor.getVoltage() / 9.766;
 		//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
 		if(distance >= 2.75) 
@@ -152,11 +157,13 @@ public class Robot extends TimedRobot
 	}
 
 	@Override
-	public void teleopInit() {
+	public void teleopInit() 
+	{
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
+		driveBackwards = new DriveBackwards();
 		if (driveForwards != null) 
 		{
 			driveForwards.changeAutonomousMode();
@@ -165,14 +172,47 @@ public class Robot extends TimedRobot
 		{
 			liftElevate.changeAutonomousMode();
 		}
+		/*if(driveBackwards != null)
+		{
+			driveBackwards.start();
+		}*/
 	}
 
 	/**
 	 * This function is called periodically during operator control.
 	 */
 	@Override
-	public void teleopPeriodic() {
+	public void teleopPeriodic() 
+	{
 		Scheduler.getInstance().run();
+		double rTrigger = oi.xbox.getRawAxis(RIGHT_TRIGGER_AXIS);
+		double lTrigger = oi.xbox.getRawAxis(LEFT_TRIGGER_AXIS);
+		if(rTrigger > 0 && lTrigger <= 0)
+		{
+			if(driveForwards != null)
+			{
+				driveForwards.start();
+			}
+			if(driveBackwards != null)
+			{
+				driveBackwards.cancel();
+			}
+			driveForwards.speed = rTrigger;
+			driveForwards.rotation = oi.xbox.getRawAxis(0);
+		}
+		else if(lTrigger > 0 && rTrigger <= 0)
+		{
+			if(driveBackwards != null)
+			{
+				driveBackwards.start();
+			}
+			if(driveForwards != null)
+			{
+				driveForwards.cancel();
+			}
+			driveBackwards.speed = lTrigger;
+			driveBackwards.rotation = oi.xbox.getRawAxis(0);
+		}
 	}
 
 	/**
