@@ -21,5 +21,14 @@ public class Grabber extends Subsystem {
         //setDefaultCommand(new MySpecialCommand());
     }
     
+    public void grabberForwards(double speed)
+    {
+    	grabberMotors.set(speed);
+    }
+    
+    public void grabberBackwards(double speed)
+    {
+    	grabberMotors.set(-1 * speed);
+    }
 }
 
