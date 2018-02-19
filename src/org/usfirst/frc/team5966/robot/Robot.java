@@ -37,6 +37,9 @@ public class Robot extends TimedRobot
 	DriveBackwards driveBackwards;
 	LiftUp liftUp;
 	LiftDown liftDown;
+	GrabberOpen grabberOpen;
+	GrabberClose grabberClose;
+	GrabberAuto grabberAuto;
 	SendableChooser<StartingPosition> startingPositionChooser = new SendableChooser<>();
 
 	AnalogInput sensor;
@@ -61,6 +64,8 @@ public class Robot extends TimedRobot
 		startingPositionChooser.addObject("Right", StartingPosition.RIGHT);
 		SmartDashboard.putData("Starting Position", startingPositionChooser);
 		autoDriveFinished = false;
+		grabberOpen = new GrabberOpen();
+		grabberClose = new GrabberClose();
 		//proximity sensor
 		sensor = new AnalogInput(0);
 		//Camera Server
@@ -106,11 +111,12 @@ public class Robot extends TimedRobot
 	{
 		driveForwards = new DriveForwards(true);
 		liftUp = new LiftUp(true);
-		
+		grabberAuto = new GrabberAuto();
 		//schedule the autonomous command (example)
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		//gathers the data from the dashboard on the position of the robot
 		//if the robot is in the same position as the switch as reported by LabView, then it will lift up
+		grabberAuto.start();
 		switch(startingPositionChooser.getSelected())
 		{
 			case LEFT:
@@ -144,9 +150,11 @@ public class Robot extends TimedRobot
 		//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
 		if(distance >= 2.75) 
 		{
+			if (grabberAuto != null) grabberAuto.cancel();
+			grabberOpen.start();
 			if (driveForwards != null) driveForwards.cancel();
 		}
-		//just for testing to check that the reading in the program corresponds with the reading fron LabView
+		//just for testing to check that the reading in the program corresponds with the reading from LabView
 		System.out.println(volts);
 	}
 
@@ -167,10 +175,6 @@ public class Robot extends TimedRobot
 		{
 			liftUp.changeAutonomousMode();
 		}
-		/*if(driveBackwards != null)
-		{
-			driveBackwards.start();
-		}*/
 	}
 
 	/**
