@@ -21,6 +21,15 @@ public class LiftUp extends Command {
     	this.isAutonomous = isAutonomous;
     	this.speed = 0;
     }
+    
+    public LiftUp(double speed) {
+        // Use requires() here to declare subsystem dependencies
+        // eg. requires(chassis);
+    	super("LiftUp");
+    	requires(lift);
+    	this.isAutonomous = false;
+    	this.speed = speed;
+    }
 
     public void changeAutonomousMode()
     {

@@ -1,15 +1,22 @@
 package org.usfirst.frc.team5966.robot.commands;
 
+import org.usfirst.frc.team5966.robot.subsystems.Grabber;
+
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
-public class LiftClose extends Command {
+public class GrabberOpen extends Command {
+	
+	Grabber grabber = new Grabber();
+	double speed;
 
-    public LiftClose() {
+    public GrabberOpen() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
+    	requires(grabber);
+    	speed = 0.32;
     }
 
     // Called just before this Command runs the first time
