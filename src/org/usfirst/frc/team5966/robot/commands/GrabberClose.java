@@ -25,6 +25,7 @@ public class GrabberClose extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	grabber.grabberBackwards(speed);
     }
 
     // Make this return true when this Command no longer needs to run execute()
