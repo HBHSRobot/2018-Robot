@@ -8,18 +8,11 @@
 package org.usfirst.frc.team5966.robot;
 
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 
-import org.usfirst.frc.team5966.robot.commands.DriveBackwards;
-import org.usfirst.frc.team5966.robot.commands.DriveForwards;
-import org.usfirst.frc.team5966.robot.commands.LiftElevate;
+import org.usfirst.frc.team5966.robot.commands.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -42,7 +35,8 @@ public class Robot extends TimedRobot
 	
 	DriveForwards driveForwards;
 	DriveBackwards driveBackwards;
-	LiftElevate liftElevate;
+	LiftUp liftUp;
+	LiftDown liftDown;
 	SendableChooser<StartingPosition> startingPositionChooser = new SendableChooser<>();
 
 	AnalogInput sensor;
@@ -111,7 +105,7 @@ public class Robot extends TimedRobot
 	public void autonomousInit() 
 	{
 		driveForwards = new DriveForwards(true);
-		liftElevate = new LiftElevate(true);
+		liftUp = new LiftUp(true);
 		
 		//schedule the autonomous command (example)
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
@@ -120,15 +114,15 @@ public class Robot extends TimedRobot
 		switch(startingPositionChooser.getSelected())
 		{
 			case LEFT:
-				if((gameData.charAt(0) == 'L') && (liftElevate != null)) 
+				if((gameData.charAt(0) == 'L') && (liftUp != null)) 
 				{
-					liftElevate.start();
+					liftUp.start();
 				}
 				break;
 			case RIGHT:
-				if((gameData.charAt(0) == 'R') && (liftElevate != null)) 
+				if((gameData.charAt(0) == 'R') && (liftUp != null)) 
 				{
-					liftElevate.start();
+					liftUp.start();
 				}
 				break;
 		}
@@ -164,13 +158,14 @@ public class Robot extends TimedRobot
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
 		driveBackwards = new DriveBackwards();
+		liftDown = new LiftDown();
 		if (driveForwards != null) 
 		{
 			driveForwards.changeAutonomousMode();
 		}
-		if (liftElevate != null)
+		if (liftUp != null)
 		{
-			liftElevate.changeAutonomousMode();
+			liftUp.changeAutonomousMode();
 		}
 		/*if(driveBackwards != null)
 		{
@@ -197,8 +192,8 @@ public class Robot extends TimedRobot
 			{
 				driveBackwards.cancel();
 			}
-			driveForwards.speed = rTrigger;
-			driveForwards.rotation = oi.xbox.getRawAxis(0);
+			driveForwards.setSpeed(rTrigger);
+			driveForwards.setRotation(oi.xbox.getRawAxis(0));
 		}
 		else if(lTrigger > 0 && rTrigger <= 0)
 		{
@@ -210,8 +205,54 @@ public class Robot extends TimedRobot
 			{
 				driveForwards.cancel();
 			}
-			driveBackwards.speed = lTrigger;
-			driveBackwards.rotation = oi.xbox.getRawAxis(0);
+			driveBackwards.setSpeed(lTrigger);
+			driveBackwards.setRotation(oi.xbox.getRawAxis(0));
+		}
+		else
+		{
+			if(driveForwards != null)
+			{
+				driveForwards.cancel();
+			}
+			if(driveBackwards != null)
+			{
+				driveBackwards.cancel();
+			}
+		}
+		
+		double rightY = oi.xbox.getRawAxis(5);
+		if (rightY > 0)
+		{
+			if (liftDown != null)
+			{
+				liftDown.cancel();
+			}
+			if (liftUp != null)
+			{
+				liftUp.start();
+			}
+		}
+		else if (rightY < 0)
+		{
+			if (liftUp != null)
+			{
+				liftUp.cancel();
+			}
+			if (liftDown != null)
+			{
+				liftDown.start();
+			}
+		}
+		else
+		{
+			if (liftUp != null)
+			{
+				liftUp.cancel();
+			}
+			if (liftDown != null)
+			{
+				liftDown.cancel();
+			}
 		}
 	}
 

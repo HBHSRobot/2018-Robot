@@ -23,8 +23,6 @@ public class OI {
 	public Joystick xbox = new Joystick(0);
 	Button buttonA = new JoystickButton(xbox, 0);
 	Button buttonB = new JoystickButton(xbox, 1);
-	Button buttonX = new JoystickButton(xbox, 2);
-	Button buttonY = new JoystickButton(xbox, 3);
 
 	// There are a few additional built in buttons you can use. Additionally,
 	// by subclassing Button you can create custom triggers and bind those to
@@ -36,7 +34,8 @@ public class OI {
 
 	// Start the command when the button is pressed and let it run the command
 	// until it is finished as determined by it's isFinished method.
-	// button.whenPressed(new ExampleCommand());
+//	buttonA.whenPressed(new LiftOpen());
+//	buttonB.whenPressed(new LiftClose());
 
 	// Run the command while the button is being held down and interrupt it once
 	// the button is released.

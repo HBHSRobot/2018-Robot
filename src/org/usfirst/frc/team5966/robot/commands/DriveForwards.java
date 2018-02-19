@@ -8,14 +8,27 @@ public class DriveForwards extends Command{
 	final double BASE_SPEED = -0.32;
 	DriveTrain drivetrain = new DriveTrain();
 	private boolean isAutonomous;
-	public double speed, rotation;
+	private double speed, rotation;
 	
 	public DriveForwards(boolean isAutonomous)
 	{
+		super("DriveForwards");
 		requires(drivetrain);
 		this.isAutonomous = isAutonomous;
+		this.speed = 0;
+		this.rotation = 0;
 	}
 
+	public void setSpeed(double speed)
+    {
+    	this.speed = speed;
+    }
+    
+    public void setRotation(double rotation)
+    {
+    	this.rotation = rotation;
+    }
+	
     public void changeAutonomousMode()
     {
     	isAutonomous = !isAutonomous;

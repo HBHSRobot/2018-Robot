@@ -1,35 +1,35 @@
 package org.usfirst.frc.team5966.robot.commands;
 
-import org.usfirst.frc.team5966.robot.subsystems.DriveTrain;
+import org.usfirst.frc.team5966.robot.subsystems.Lift;
 
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
-public class DriveBackwards extends Command {
+public class LiftUp extends Command {
 
-	DriveTrain drivetrain = new DriveTrain();
+	Lift lift = new Lift();
+	private boolean isAutonomous;
+	private double speed;
 	
-	private double speed, rotation;
-	
-    public DriveBackwards() {
+    public LiftUp(boolean isAutonomous) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	super("DriveBackwards");
-    	requires(drivetrain);
+    	super("LiftUp");
+    	requires(lift);
+    	this.isAutonomous = isAutonomous;
     	this.speed = 0;
-    	this.rotation = 0;
     }
 
+    public void changeAutonomousMode()
+    {
+    	isAutonomous = !isAutonomous;
+    }
+    
     public void setSpeed(double speed)
     {
     	this.speed = speed;
-    }
-    
-    public void setRotation(double rotation)
-    {
-    	this.rotation = rotation;
     }
     
     // Called just before this Command runs the first time
@@ -37,8 +37,16 @@ public class DriveBackwards extends Command {
     }
 
     // Called repeatedly when this Command is scheduled to run
-    protected void execute() {
-    	drivetrain.reverseDrive(speed, rotation);
+    protected void execute() 
+    {
+    	if (isAutonomous)
+    	{
+    		lift.liftUpSpeed(0.32);
+    	}
+    	else
+    	{
+    		lift.liftUpSpeed(speed);
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
