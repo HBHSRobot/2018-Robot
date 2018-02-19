@@ -7,6 +7,8 @@
 
 package org.usfirst.frc.team5966.robot;
 
+import org.usfirst.frc.team5966.robot.commands.*;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.*;
 
@@ -34,12 +36,16 @@ public class OI {
 
 	// Start the command when the button is pressed and let it run the command
 	// until it is finished as determined by it's isFinished method.
-//	buttonA.whenPressed(new LiftOpen());
-//	buttonB.whenPressed(new LiftClose());
+    // button.whenPressed(new ExampleCommand());
 
 	// Run the command while the button is being held down and interrupt it once
 	// the button is released.
-	// button.whileHeld(new ExampleCommand());
+	public OI()
+	{
+		buttonA.whileHeld(new GrabberOpen());
+		buttonB.whileHeld(new GrabberClose());
+	}
+
 
 	// Start the command when the button is released and let it run the command
 	// until it is finished as determined by it's isFinished method.
