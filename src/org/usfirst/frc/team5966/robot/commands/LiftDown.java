@@ -19,6 +19,14 @@ public class LiftDown extends Command {
     	requires(lift);
     	this.speed = 0;
     }
+    
+    public LiftDown(double speed) {
+        // Use requires() here to declare subsystem dependencies
+        // eg. requires(chassis);
+    	super("LiftDown");
+    	requires(lift);
+    	this.speed = speed;
+    }
 
     public void setSpeed(double speed)
     {
