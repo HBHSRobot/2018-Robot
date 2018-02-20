@@ -75,7 +75,7 @@ public class Lift extends Subsystem {
     
     public void liftStop()
     {
-    	position += motorEncoder.getDistance();
+    	//position += motorEncoder.getDistance();
     	liftMotors.stopMotor();
     }
 }

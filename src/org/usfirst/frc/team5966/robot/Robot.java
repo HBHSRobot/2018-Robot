@@ -229,32 +229,38 @@ public class Robot extends TimedRobot
 		{
 			if (liftDown != null)
 			{
+				liftDown.setSpeed(0);
 				liftDown.cancel();
 			}
 			if (liftUp != null)
 			{
 				liftUp.start();
+				liftUp.setSpeed(rightY);
 			}
 		}
 		else if (rightY < 0)
 		{
 			if (liftUp != null)
 			{
+				liftUp.setSpeed(0);
 				liftUp.cancel();
 			}
 			if (liftDown != null)
 			{
 				liftDown.start();
+				liftDown.setSpeed(rightY);
 			}
 		}
 		else
 		{
 			if (liftUp != null)
 			{
+				liftUp.setSpeed(0);
 				liftUp.cancel();
 			}
 			if (liftDown != null)
 			{
+				liftDown.setSpeed(0);
 				liftDown.cancel();
 			}
 		}
