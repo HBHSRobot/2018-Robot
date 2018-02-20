@@ -11,6 +11,7 @@ public class GrabberAuto extends Command {
 
 	Grabber grabber = new Grabber();
 	double speed;
+	boolean finished = false;
 	
     public GrabberAuto() {
         // Use requires() here to declare subsystem dependencies
@@ -29,11 +30,14 @@ public class GrabberAuto extends Command {
     	//in seconds
     	setTimeout(1.5);
     	grabber.grabberBackwards(speed);
+    	finished = true;
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
+    	if (finished)
+    		grabber.stopMotors();
+        return finished;
     }
 
     // Called once after isFinished returns true

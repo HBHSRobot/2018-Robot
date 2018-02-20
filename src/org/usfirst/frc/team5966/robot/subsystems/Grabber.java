@@ -30,5 +30,10 @@ public class Grabber extends Subsystem {
     {
     	grabberMotors.set(-1 * speed);
     }
+    
+    public void stopMotors()
+    {
+    	grabberMotors.set(0);
+    }
 }
 
