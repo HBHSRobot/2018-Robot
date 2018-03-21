@@ -9,12 +9,14 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class GrabberOpen extends Command {
 	
-	Grabber grabber = new Grabber();
+	Grabber grabber;
 	double speed;
 
-    public GrabberOpen() {
+    public GrabberOpen(Grabber grabberInstance) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
+    	super("GrabberOpen");
+    	grabber = grabberInstance;
     	requires(grabber);
     	speed = 0.32;
     }

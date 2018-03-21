@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 
 import org.usfirst.frc.team5966.robot.commands.*;
+import org.usfirst.frc.team5966.robot.subsystems.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -33,14 +34,19 @@ public class Robot extends TimedRobot
 
 	String gameData;
 	
+	Grabber grabber;
+	DriveTrain drivetrain;
+	Lift lift;
+	
 	DriveForwards driveForwards;
 	DriveBackwards driveBackwards;
 	LiftUp liftUp;
 	LiftDown liftDown;
+	StopLift stopLift;
 	GrabberOpen grabberOpen;
 	GrabberClose grabberClose;
 	GrabberAuto grabberAuto;
-	SendableChooser<StartingPosition> startingPositionChooser = new SendableChooser<>();
+	SendableChooser<StartingPosition> startingPositionChooser;
 
 	AnalogInput sensor;
 	double volts;
@@ -49,6 +55,7 @@ public class Robot extends TimedRobot
 	
 	final int RIGHT_TRIGGER_AXIS = 3;
 	final int LEFT_TRIGGER_AXIS = 2;
+	final double LIFT_DEAD_SPOT = 0.25;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -59,18 +66,30 @@ public class Robot extends TimedRobot
 	{
 		oi = new OI();
 		//Chooser for the robot's starting position on the dashboard
+		startingPositionChooser =  new SendableChooser<StartingPosition>();
 		startingPositionChooser.addObject("Left", StartingPosition.LEFT);
 		startingPositionChooser.addDefault("Middle", StartingPosition.MIDDLE);
 		startingPositionChooser.addObject("Right", StartingPosition.RIGHT);
 		SmartDashboard.putData("Starting Position", startingPositionChooser);
+		
 		autoDriveFinished = false;
-		grabberOpen = new GrabberOpen();
-		grabberClose = new GrabberClose();
+		
+		grabber = oi.getGrabber();
+		drivetrain = oi.getDriveTrain();
+		lift = new Lift();
+		
+		grabberOpen = new GrabberOpen(grabber);
+		grabberClose = new GrabberClose(grabber);
+		driveForwards = new DriveForwards(drivetrain, true);
+		liftUp = new LiftUp(lift, true);
+		stopLift = new StopLift(lift);
+		
 		//proximity sensor
 		sensor = new AnalogInput(0);
+		
 		//Camera Server
 		cameraServer = CameraServer.getInstance();
-		UsbCamera camera = new UsbCamera("Lifecam", "/dev/video0");
+		UsbCamera camera = new UsbCamera("HudsonCam", "/dev/video0");
 		cameraServer.addCamera(camera);
 		cameraServer.startAutomaticCapture(camera);
 		System.out.println("Robot Initialization Complete");
@@ -109,9 +128,7 @@ public class Robot extends TimedRobot
 	@Override
 	public void autonomousInit() 
 	{
-		driveForwards = new DriveForwards(true);
-		liftUp = new LiftUp(true);
-		grabberAuto = new GrabberAuto();
+		grabberAuto = new GrabberAuto(grabber);
 		//schedule the autonomous command (example)
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		//gathers the data from the dashboard on the position of the robot
@@ -150,9 +167,15 @@ public class Robot extends TimedRobot
 		//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
 		if(distance >= 2.75) 
 		{
-			if (grabberAuto != null) grabberAuto.cancel();
+			if (grabberAuto != null)
+			{
+				grabberAuto.cancel();
+			}
 			grabberOpen.start();
-			if (driveForwards != null) driveForwards.cancel();
+			if (driveForwards != null)
+			{
+				driveForwards.cancel();
+			}
 		}
 		//just for testing to check that the reading in the program corresponds with the reading from LabView
 		System.out.println(volts);
@@ -165,8 +188,8 @@ public class Robot extends TimedRobot
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
-		driveBackwards = new DriveBackwards();
-		liftDown = new LiftDown();
+		driveBackwards = new DriveBackwards(drivetrain);
+		liftDown = new LiftDown(lift);
 		if (driveForwards != null) 
 		{
 			driveForwards.changeAutonomousMode();
@@ -183,11 +206,13 @@ public class Robot extends TimedRobot
 	@Override
 	public void teleopPeriodic() 
 	{
+		System.out.println("Teleop Periodic");
 		Scheduler.getInstance().run();
-		double rTrigger = oi.xbox.getRawAxis(RIGHT_TRIGGER_AXIS);
-		double lTrigger = oi.xbox.getRawAxis(LEFT_TRIGGER_AXIS);
+		double rTrigger = oi.getXbox().getRawAxis(RIGHT_TRIGGER_AXIS);
+		double lTrigger = oi.getXbox().getRawAxis(LEFT_TRIGGER_AXIS);
 		if(rTrigger > 0 && lTrigger <= 0)
 		{
+			System.out.println("Drive Forwards");
 			if(driveForwards != null)
 			{
 				driveForwards.start();
@@ -197,10 +222,11 @@ public class Robot extends TimedRobot
 				driveBackwards.cancel();
 			}
 			driveForwards.setSpeed(rTrigger);
-			driveForwards.setRotation(oi.xbox.getRawAxis(0));
+			driveForwards.setRotation(oi.getXbox().getRawAxis(0));
 		}
 		else if(lTrigger > 0 && rTrigger <= 0)
 		{
+			System.out.println("Drive Backwards");
 			if(driveBackwards != null)
 			{
 				driveBackwards.start();
@@ -210,10 +236,11 @@ public class Robot extends TimedRobot
 				driveForwards.cancel();
 			}
 			driveBackwards.setSpeed(lTrigger);
-			driveBackwards.setRotation(oi.xbox.getRawAxis(0));
+			driveBackwards.setRotation(oi.getXbox().getRawAxis(0));
 		}
 		else
 		{
+			System.out.println("Stop Drive");
 			if(driveForwards != null)
 			{
 				driveForwards.cancel();
@@ -224,8 +251,9 @@ public class Robot extends TimedRobot
 			}
 		}
 		
-		double rightY = oi.xbox.getRawAxis(5);
-		if (rightY > 0)
+		double rightY = oi.getXbox().getRawAxis(5);
+		System.out.println("Right Analog Stick Y Axis: " + rightY);
+		if (rightY > LIFT_DEAD_SPOT)
 		{
 			if (liftDown != null)
 			{
@@ -238,7 +266,7 @@ public class Robot extends TimedRobot
 				liftUp.setSpeed(rightY);
 			}
 		}
-		else if (rightY < 0)
+		else if (rightY < -1 * LIFT_DEAD_SPOT)
 		{
 			if (liftUp != null)
 			{
@@ -253,15 +281,24 @@ public class Robot extends TimedRobot
 		}
 		else
 		{
+			System.out.println("Stop Lift");
 			if (liftUp != null)
 			{
 				liftUp.setSpeed(0);
 				liftUp.cancel();
+				lift.liftStop();
 			}
 			if (liftDown != null)
 			{
 				liftDown.setSpeed(0);
 				liftDown.cancel();
+				lift.liftStop();
+			}
+			if (stopLift != null)
+			{
+				stopLift.start();
+				stopLift.cancel();
+				lift.liftStop();
 			}
 		}
 	}

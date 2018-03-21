@@ -9,15 +9,16 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class LiftDown extends Command {
 	
-	Lift lift = new Lift();
+	Lift lift;
 	private double speed;
 
-    public LiftDown() {
+    public LiftDown(Lift liftInstance) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	super("LiftDown");
-    	requires(lift);
     	this.speed = 0;
+    	lift = liftInstance;
+    	requires(lift);
     }
     
     public LiftDown(double speed) {

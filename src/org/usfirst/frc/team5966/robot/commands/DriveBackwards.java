@@ -9,17 +9,19 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class DriveBackwards extends Command {
 
-	DriveTrain drivetrain = new DriveTrain();
+	DriveTrain drivetrain;
 	
 	private double speed, rotation;
 	
-    public DriveBackwards() {
+    public DriveBackwards(DriveTrain drivetrainInstance) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	super("DriveBackwards");
-    	requires(drivetrain);
+    	
     	this.speed = 0;
     	this.rotation = 0;
+    	drivetrain = drivetrainInstance;
+    	requires(drivetrain);
     }
 
     public void setSpeed(double speed)

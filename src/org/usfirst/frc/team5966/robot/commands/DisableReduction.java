@@ -1,24 +1,22 @@
 package org.usfirst.frc.team5966.robot.commands;
 
-import org.usfirst.frc.team5966.robot.subsystems.Grabber;
+import org.usfirst.frc.team5966.robot.subsystems.DriveTrain;
 
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
-public class GrabberClose extends Command {
+public class DisableReduction extends Command {
 
-	Grabber grabber;
-	double speed;
+	DriveTrain driveTrain;
 	
-    public GrabberClose(Grabber grabberInstance) {
+    public DisableReduction(DriveTrain drive) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	super("GrabberClose");
-    	grabber = grabberInstance;
-    	requires(grabber);
-    	speed = 0.32;
+    	super("DisableReduction");
+    	driveTrain = drive;
+    	requires(driveTrain);
     }
 
     // Called just before this Command runs the first time
@@ -27,7 +25,7 @@ public class GrabberClose extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	grabber.grabberBackwards(speed);
+    	driveTrain.setReductionMode(false);
     }
 
     // Make this return true when this Command no longer needs to run execute()

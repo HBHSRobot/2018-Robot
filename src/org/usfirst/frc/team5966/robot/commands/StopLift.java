@@ -1,38 +1,36 @@
 package org.usfirst.frc.team5966.robot.commands;
 
-import org.usfirst.frc.team5966.robot.subsystems.Grabber;
+import org.usfirst.frc.team5966.robot.subsystems.Lift;
 
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
-public class GrabberClose extends Command {
+public class StopLift extends Command {
 
-	Grabber grabber;
-	double speed;
+	Lift lift;
 	
-    public GrabberClose(Grabber grabberInstance) {
+    public StopLift(Lift liftInstance) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
-    	super("GrabberClose");
-    	grabber = grabberInstance;
-    	requires(grabber);
-    	speed = 0.32;
+    	super("StopLift");
+    	lift = liftInstance;
+    	requires(lift);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    	lift.liftStop();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	grabber.grabberBackwards(speed);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
+        return true;
     }
 
     // Called once after isFinished returns true
