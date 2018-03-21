@@ -8,6 +8,7 @@
 package org.usfirst.frc.team5966.robot;
 
 import org.usfirst.frc.team5966.robot.commands.*;
+import org.usfirst.frc.team5966.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.*;
@@ -22,9 +23,12 @@ public class OI {
 	//// joystick.
 	// You create one by telling it which joystick it's on and which button
 	// number it is.
-	public Joystick xbox = new Joystick(0);
-	Button buttonA = new JoystickButton(xbox, 0);
-	Button buttonB = new JoystickButton(xbox, 1);
+	private Grabber grabber;
+	private DriveTrain driveTrain;
+	private Joystick xbox;
+	private Button buttonA;
+	private Button buttonB;
+	private Button buttonLeftStickButton;
 
 	// There are a few additional built in buttons you can use. Additionally,
 	// by subclassing Button you can create custom triggers and bind those to
@@ -42,10 +46,34 @@ public class OI {
 	// the button is released.
 	public OI()
 	{
-		buttonA.whileHeld(new GrabberOpen());
-		buttonB.whileHeld(new GrabberClose());
+		grabber = new Grabber();
+		driveTrain = new DriveTrain();
+		
+		xbox = new Joystick(0);
+		buttonA = new JoystickButton(xbox, 1);
+		buttonB = new JoystickButton(xbox, 2);
+		buttonLeftStickButton = new JoystickButton(xbox, 9);
+		
+		buttonA.whileHeld(new GrabberOpen(grabber));
+		buttonB.whileHeld(new GrabberClose(grabber));
+		buttonLeftStickButton.whenPressed(new EnableReduction(driveTrain));
+		buttonLeftStickButton.whenReleased(new DisableReduction(driveTrain));
 	}
 
+	public Joystick getXbox()
+	{
+		return xbox;
+	}
+	
+	public Grabber getGrabber()
+	{
+		return grabber;
+	}
+	
+	public DriveTrain getDriveTrain()
+	{
+		return driveTrain;
+	}
 
 	// Start the command when the button is released and let it run the command
 	// until it is finished as determined by it's isFinished method.

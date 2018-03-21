@@ -5,18 +5,20 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class DriveForwards extends Command{
 
-	final double BASE_SPEED = -0.32;
-	DriveTrain drivetrain = new DriveTrain();
+	final double BASE_SPEED = 0.32;
+	
+	DriveTrain drivetrain;
 	private boolean isAutonomous;
 	private double speed, rotation;
 	
-	public DriveForwards(boolean isAutonomous)
+	public DriveForwards(DriveTrain drivetrainInstance, boolean isAutonomous)
 	{
 		super("DriveForwards");
-		requires(drivetrain);
+		drivetrain = drivetrainInstance;
 		this.isAutonomous = isAutonomous;
 		this.speed = 0;
 		this.rotation = 0;
+		requires(drivetrain);
 	}
 
 	public void setSpeed(double speed)
@@ -41,6 +43,7 @@ public class DriveForwards extends Command{
 	
 	protected void execute()
 	{
+		System.out.println("Execute Drive Forwards");
 		if (isAutonomous)
 		{
 			drivetrain.forwardDrive(BASE_SPEED, 0);

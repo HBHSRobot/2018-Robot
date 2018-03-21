@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  */
 public class Grabber extends Subsystem {
 	
-	VictorSP motorLeft = new VictorSP(6);
-	VictorSP motorRight = new VictorSP(7);
+	VictorSP motorLeft = new VictorSP(5);
+	VictorSP motorRight = new VictorSP(6);
 	
 	SpeedControllerGroup grabberMotors = new SpeedControllerGroup(motorLeft, motorRight);
 

@@ -9,17 +9,18 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class LiftUp extends Command {
 
-	Lift lift = new Lift();
+	Lift lift;
 	private boolean isAutonomous;
 	private double speed;
 	
-    public LiftUp(boolean isAutonomous) {
+    public LiftUp(Lift liftInstance, boolean isAutonomous) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	super("LiftUp");
-    	requires(lift);
     	this.isAutonomous = isAutonomous;
     	this.speed = 0;
+    	lift = liftInstance;
+    	requires(lift);
     }
     
     public LiftUp(double speed) {

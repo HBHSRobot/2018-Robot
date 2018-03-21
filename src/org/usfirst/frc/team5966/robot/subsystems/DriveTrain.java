@@ -9,11 +9,14 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  */
 public class DriveTrain extends Subsystem {
 	
+	final double ROTATION_REDUCTION = 0.7;
+	boolean reductionEnabled = true;
+	
 	//4 motors
-	VictorSP frontLeft = new VictorSP(0);	
-	VictorSP backLeft = new VictorSP(1);
-	VictorSP frontRight = new VictorSP(2);
-	VictorSP backRight = new VictorSP(3);
+	VictorSP frontLeft = new VictorSP(2);	
+	VictorSP backLeft = new VictorSP(3);
+	VictorSP frontRight = new VictorSP(0);
+	VictorSP backRight = new VictorSP(1);
 	
 	//2 motor groups
 	SpeedControllerGroup leftMotors = new SpeedControllerGroup(frontLeft, backLeft);
@@ -33,7 +36,14 @@ public class DriveTrain extends Subsystem {
     
     public void baseRegularDrive(double speed, double rotation)
     {
-    	robotDrive.curvatureDrive(speed, rotation, false);
+    	if (reductionEnabled)
+    	{
+    		robotDrive.curvatureDrive(speed, rotation * ROTATION_REDUCTION, !reductionEnabled);
+    	}
+    	else
+    	{
+    		robotDrive.curvatureDrive(speed, rotation, !reductionEnabled);
+    	}
     }
     
     public void forwardDrive(double speed, double rotation)
@@ -44,6 +54,11 @@ public class DriveTrain extends Subsystem {
     public void reverseDrive(double speed, double rotation)
     {
     	baseRegularDrive(-1 * speed, -1 * rotation);
+    }
+    
+    public void setReductionMode(boolean enable)
+    {
+    	reductionEnabled = enable;
     }
 }
 
