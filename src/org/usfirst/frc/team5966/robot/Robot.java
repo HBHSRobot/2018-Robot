@@ -169,8 +169,11 @@ public class Robot extends TimedRobot
 		double distMili = (conversion / 4.883) * 5;
 		double distance = distMili * 0.0393701;
 		double recalcVerify = (distMili / 5) * 0.004883;
-		//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
-		if(distance >= 2.75) 
+		final double DEFAULT_DISTANCE = 5.6;
+		final double OFFSET = 3;
+		//DEFAULT_DISTANCE represents the space between the sensor and edge of the robot + bumper
+		//OFFSET is how far we want to be from the switch
+		if(distance <= DEFAULT_DISTANCE + OFFSET) 
 		{
 			if (grabberAuto != null)
 			{
