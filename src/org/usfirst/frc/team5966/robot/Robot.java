@@ -165,16 +165,18 @@ public class Robot extends TimedRobot
 		//UNUSED double distance = sensor.getVoltage() / 9.766;
 		//sensor reports in volts, which is then converted to miliVolts, then converted to millimeters
 		//millimeters converts to inches
-		double conversion = sensor.getVoltage() / 1024;
+		double volts = sensor.getVoltage();
+		double conversion = volts * 1024;
 		double distMili = (conversion / 4.883) * 5;
 		double distance = distMili * 0.0393701;
 		double recalcVerify = (distMili / 5) * 0.004883;
 		final double DEFAULT_DISTANCE = 5.6;
-		final double OFFSET = 3;
+		final double OFFSET = 6;
 		//DEFAULT_DISTANCE represents the space between the sensor and edge of the robot + bumper
 		//OFFSET is how far we want to be from the switch
 		if(distance <= DEFAULT_DISTANCE + OFFSET) 
 		{
+			System.out.println("Stop Driving");
 			if (grabberAuto != null)
 			{
 				grabberAuto.cancel();
