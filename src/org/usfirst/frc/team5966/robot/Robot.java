@@ -162,8 +162,13 @@ public class Robot extends TimedRobot
 	public void autonomousPeriodic()
 	{
 		Scheduler.getInstance().run();
-		//gets the voltage from the sensor, then divides it by 9.766, our scaling factor
-		double distance = sensor.getVoltage() / 9.766;
+		//UNUSED double distance = sensor.getVoltage() / 9.766;
+		//sensor reports in volts, which is then converted to miliVolts, then converted to millimeters
+		//millimeters converts to inches
+		double conversion = sensor.getVoltage() / 1024;
+		double distMili = (conversion / 4.883) * 5;
+		double distance = distMili * 0.0393701;
+		double recalcVerify = (distMili / 5) * 0.004883;
 		//2.75 is a placeholder range for the sensor in inches, change to whatever is actually needed
 		if(distance >= 2.75) 
 		{
@@ -178,7 +183,7 @@ public class Robot extends TimedRobot
 			}
 		}
 		//just for testing to check that the reading in the program corresponds with the reading from LabView
-		System.out.println(volts);
+		System.out.println("Voltage: " + volts + ", Distance from object: " + distance + "\n Recalculated Voltage: " + recalcVerify);
 	}
 
 	@Override
