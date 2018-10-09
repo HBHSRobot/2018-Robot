@@ -286,7 +286,7 @@ public class Robot extends TimedRobot
 			if (liftDown != null)
 			{
 				liftDown.start();
-				liftDown.setSpeed(rightY);
+				liftDown.setSpeed((rightY)/2);
 			}
 		}
 		else
